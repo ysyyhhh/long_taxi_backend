@@ -1,9 +1,8 @@
-package com.example.demo.result;
+package com.example.demo.model.result;
 
 import lombok.Data;
 
 import java.io.Serializable;
-
 
 @Data
 public class Result<T> implements Serializable {
@@ -28,6 +27,13 @@ public class Result<T> implements Serializable {
         this.message = resultCode.getMessage();
     }
 
+
+    public static <T> Result<T> success() {
+        Result<T> result = new Result<T>();
+        result.setCode(ResultCode.SUCCESS.getCode());
+        result.setMessage(ResultCode.SUCCESS.getMessage());
+        return result;
+    }
     /**
      * 成功
      */

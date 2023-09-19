@@ -1,12 +1,13 @@
 package com.example.demo.controller;
 
-import com.example.demo.result.Result;
-import com.example.demo.result.ResultCode;
+import com.example.demo.model.request.NewOrder;
+import com.example.demo.model.result.Result;
+import com.example.demo.model.result.ResultCode;
 import com.example.demo.service.OrderService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.sql.Date;
 import java.util.Map;
 
 @RestController
@@ -15,30 +16,45 @@ public class OrderController {
     @Resource
     OrderService orderService;
 
+    @ApiOperation(value = "新建订单")
     @PostMapping("/new")
-    public Result newOrder(@RequestBody Map<String,Object> params) {
-//        String user_id;
-//        String car_id;
-        String user_id = (String) params.get("user_id");
-        String car_id = (String) params.get("car_id");
-        if (user_id == null || car_id == null) {
-            return Result.error(ResultCode.PARAM_IS_BLANK);
+    public Result newOrder(@ModelAttribute NewOrder newOrder) {
+        try {
+            return Result.success(orderService.newOrder(newOrder));
+        }catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(ResultCode.PARAM_IS_INVALID);
         }
-        return orderService.newOrder(user_id,car_id);
     }
 
-    @PostMapping("/update")
-    public Result updateOrder(@RequestBody Map<String,Object> params) {
-        String id = (String) params.get("id");
-        String status = (String) params.get("status");
-        if (id == null || status == null) {
-            return Result.error(ResultCode.PARAM_IS_BLANK);
-        }
-        return orderService.updateOrder(id,status);
+    @GetMapping("/getOrder/{id}")
+    public Result getOrder(@PathVariable("id") String orderId) {
+        return orderService.getOrder(orderId);
+    }
+    @GetMapping("/getList/{id}")
+    public Result getOrderList(@PathVariable("id") String userId) {
+        return orderService.getOrderList(userId);
     }
 
-    @GetMapping("/getList")
-    public Result getOrderList() {
-        return orderService.getOrderList();
+    @PostMapping("/cancel")
+    public Result cancelOrder(@RequestParam String orderId) {
+        return orderService.cancelOrder(orderId);
     }
+
+    /**
+     * 用户点击确认上车调用
+     */
+    @PostMapping("/confirmUp")
+    public Result confirmUp(@RequestParam String orderId) {
+        return orderService.confirmUp(orderId);
+    }
+
+    /**
+     * 用户点击确认下车调用
+     */
+    @PostMapping("/confirmDown")
+    public Result confirmDown(@RequestParam String orderId) {
+        return orderService.confirmDown(orderId);
+    }
+
 }

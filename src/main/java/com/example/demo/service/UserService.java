@@ -1,14 +1,17 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.User;
+import com.example.demo.model.entity.User;
 import com.example.demo.mapper.UserMapper;
-import com.example.demo.result.Result;
-import com.example.demo.result.ResultCode;
+import com.example.demo.model.result.Result;
+import com.example.demo.model.result.ResultCode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import java.util.Map;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -25,6 +28,7 @@ public class UserService {
         }
         return Result.success(user);
     }
+
 
     public Result signUp(String phone, String password, String username) {
         User user = userMapper.findByLoginName(phone);
@@ -64,5 +68,47 @@ public class UserService {
         user.setType(type);
         userMapper.update(user);
         return Result.success(user);
+    }
+
+    public static final String APPID = "微信小程序的APPID";
+    public static final String SECRET = "微信小程序的SECRET";
+    public Result wxLogin(String code) {
+        //https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
+        RestTemplate restTemplate=new RestTemplate();
+        String url="https://api.weixin.qq.com/sns/jscode2session?appid="+APPID+"&secret="+SECRET+"&js_code="+code+"&grant_type=authorization_code";
+        String json =restTemplate.getForObject(url,String.class);
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(json);
+            if (jsonObject.has("errcode")) {
+                return Result.error(ResultCode.USER_LOGIN_ERROR);
+            }
+            String openid = (String) jsonObject.get("openid");
+            log.info("openid:{}",openid);
+
+            User user = userMapper.findByLoginName(openid);
+            if (user != null) {
+                //如果存在则直接返回
+                return Result.success(user);
+            }
+
+            //不存在则注册
+            Integer num = userMapper.getNum();
+            user = new User();
+
+            // u001
+            user.setId("u" + String.format("%03d", num + 1));
+            user.setPhone(openid);
+            user.setPassword(openid);
+            user.setUsername("wx_" + user.getId());
+            user.setType("wx_user");
+            userMapper.insert(user);
+
+            return Result.success(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Result.error(ResultCode.USER_LOGIN_ERROR);
     }
 }

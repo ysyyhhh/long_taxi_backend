@@ -1,9 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.result.Result;
-import com.example.demo.result.ResultCode;
+import com.example.demo.model.result.Result;
+import com.example.demo.model.result.ResultCode;
 import com.example.demo.service.UserService;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +58,15 @@ public class UserController {
             return Result.error(ResultCode.PARAM_IS_BLANK);
         }
         return userService.update(id,password,type);
+    }
+
+    @PostMapping("/wxLogin")
+    public Result wxLogin(@RequestBody Map<String,String>params) {
+        String code = (String) params.get("code");
+        if (code == null) {
+            return Result.error(ResultCode.PARAM_IS_BLANK);
+        }
+        return userService.wxLogin(code);
     }
 
 }

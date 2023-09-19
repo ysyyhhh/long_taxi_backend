@@ -1,4 +1,4 @@
-package com.example.demo.result;
+package com.example.demo.model.result;
 
 public enum ResultCode {
 
@@ -17,7 +17,13 @@ public enum ResultCode {
     USER_LOGIN_ERROR(2002, "账号不存在或密码错误"),
     USER_HAS_EXISTED(2003, "用户已存在"),
     USER_NOT_EXIST(2004, "用户不存在"),
-    SYSTEM_ERROR(10000, "系统异常，请稍后重试");
+    SYSTEM_ERROR(10000, "系统异常，请稍后重试"),
+
+    /* 业务错误 */
+    ORDER_STATUS_ERROR(3001, "订单状态异常"),
+    NO_ORDER(3002, "订单不存在"),
+
+    NO_ROUTE(3003, "没有路径信息");
 
     private Integer code;
     private String message;

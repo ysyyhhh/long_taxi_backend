@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.result.Result;
-import com.example.demo.result.ResultCode;
+import com.example.demo.model.result.Result;
+import com.example.demo.model.result.ResultCode;
 import com.example.demo.service.CarService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +17,12 @@ public class CarController {
 
     @GetMapping("/getList")
     public Result getCarList() {
-        return carService.getCarList();
+        return Result.success(carService.getCarList());
     }
 
     @PostMapping("/new")
     public Result newCar(@RequestBody Map<String,Object> params) {
-        String status = (String) params.get("status");
+        Boolean status = (Boolean) params.get("status");
         Double longitude = (Double) params.get("longitude");
         Double latitude = (Double) params.get("latitude");
         if (status == null || longitude == null || latitude == null) {
@@ -35,7 +35,7 @@ public class CarController {
     @PostMapping("/update")
     public Result updateCar(@RequestBody Map<String,Object> params) {
         String id = (String) params.get("id");
-        String status = (String) params.get("status");
+        Boolean status = (Boolean) params.get("status");
         Double longitude = (Double) params.get("longitude");
         Double latitude = (Double) params.get("latitude");
         if (id == null || status == null || longitude == null || latitude == null) {
@@ -44,5 +44,9 @@ public class CarController {
         return carService.updateCar(id,status,longitude,latitude);
     }
 
+    @GetMapping("/getCarByOrderId/{orderId}")
+    public Result getCarByOrderId(@PathVariable("orderId") String orderId) {
+        return Result.success(carService.getCarByOrderId(orderId));
+    }
 
 }

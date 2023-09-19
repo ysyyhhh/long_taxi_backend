@@ -1,0 +1,8 @@
+- id: 1
+  name: 3
+  lon: 1.1
+  lat: 1.2
+- id: 2
+  name: 2
+  lon: 2.2
+  lat: 2.1

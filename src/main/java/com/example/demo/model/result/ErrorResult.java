@@ -1,4 +1,4 @@
-package com.example.demo.result;
+package com.example.demo.model.result;
 
 /**
  * 异常结果包装类
